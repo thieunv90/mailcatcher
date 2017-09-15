@@ -1,61 +1,51 @@
-require "fileutils"
-require "rubygems"
+require 'rubygems'
+require 'rubygems/package'
+require File.expand_path('../lib/mail_catcher/version', __FILE__)
 
-require "mail_catcher/version"
+spec_file = File.expand_path __FILE__ + '/../mailcatcher.gemspec'
+spec = Gem::Specification.load spec_file
 
-# XXX: Would prefer to use Rake::SprocketsTask but can't populate
-# non-digest assets, and we don't want sprockets at runtime so
-# can't use manifest directly. Perhaps index.html should be
-# precompiled with digest assets paths?
+require 'rdoc/task'
+RDoc::Task.new :rdoc => "doc",
+    :clobber_rdoc => "doc:clean",
+    :rerdoc => "doc:force" do |rdoc|
+  rdoc.title = "MailCatcher #{MailCatcher::VERSION}"
+  rdoc.rdoc_dir = 'doc'
+  rdoc.main = 'README.md'
+  rdoc.rdoc_files.include 'lib/**/*.rb'
+end
 
-desc "Compile assets"
-task "assets" do
-  compiled_path = File.expand_path("../public/assets", __FILE__)
-  FileUtils.mkdir_p(compiled_path)
-
-  require "mail_catcher/web/assets"
-  sprockets = MailCatcher::Web::Assets
-  sprockets.css_compressor = :sass
-  sprockets.js_compressor = :uglifier
-  sprockets.each_logical_path(/(\Amailcatcher\.(js|css)|\.(xsl|png)\Z)/) do |logical_path|
-    if asset = sprockets.find_asset(logical_path)
-      target = File.join(compiled_path, logical_path)
-      asset.write_to target
-    end
+desc "Compile SASS/SCSS files into SCSS"
+task "build:sass" do
+  Dir["public/stylesheets/**/*.sass"].each do |file|
+    css_file = file.sub /\.sass$/, ".css"
+    system "sass", "--no-cache", "--compass", file, css_file
   end
 end
 
+desc "Compile CoffeeScript files into JavaScript"
+task "build:coffee" do
+  require 'coffee-script'
+  Dir["public/javascripts/**/*.coffee"].each do |file|
+    js_file = file.sub /\.coffee$/, ".js"
+    File.new(js_file, "w").write CoffeeScript.compile File.read file
+  end
+end
+
+multitask "build" => ["build:sass", "build:coffee"]
+
 desc "Package as Gem"
-task "package" => ["assets"] do
-  require "rubygems/package"
-  require "rubygems/specification"
-
-  spec_file = File.expand_path("../mailcatcher.gemspec", __FILE__)
-  spec = Gem::Specification.load(spec_file)
-
+task "package:gem" do
   Gem::Package.build spec
 end
 
+task "package" => ["build", "package:gem"]
+
 desc "Release Gem to RubyGems"
-task "release" => ["package"] do
+task "release:gem" do
   %x[gem push mailcatcher-#{MailCatcher::VERSION}.gem]
 end
 
-require "rdoc/task"
+task "release" => ["package", "release:gem"]
 
-RDoc::Task.new(:rdoc => "doc",:clobber_rdoc => "doc:clean", :rerdoc => "doc:force") do |rdoc|
-  rdoc.title = "MailCatcher #{MailCatcher::VERSION}"
-  rdoc.rdoc_dir = "doc"
-  rdoc.main = "README.md"
-  rdoc.rdoc_files.include "lib/**/*.rb"
-end
-
-require "rake/testtask"
-
-Rake::TestTask.new do |task|
-  task.pattern = "spec/*_spec.rb"
-end
-
-task :test => :assets
-
-task :default => :test
+task "default" => "build"

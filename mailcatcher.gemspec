@@ -1,4 +1,4 @@
-require File.expand_path("../lib/mail_catcher/version", __FILE__)
+require File.expand_path('../lib/mail_catcher/version', __FILE__)
 
 Gem::Specification.new do |s|
   s.name = "mailcatcher"
@@ -21,32 +21,33 @@ Gem::Specification.new do |s|
     "README.md", "LICENSE", "VERSION",
     "bin/*",
     "lib/**/*.rb",
-    "public/**/*",
-    "views/**/*",
-  ] - Dir["lib/mail_catcher/web/assets.rb"]
+    "public/favicon.ico",
+    "public/images/**/*",
+    "public/javascripts/**/*.js",
+    "public/stylesheets/**/*.{css,xsl}",
+    "views/**/*"
+  ]
   s.require_paths = ["lib"]
   s.executables = ["mailcatcher", "catchmail"]
   s.extra_rdoc_files = ["README.md", "LICENSE"]
 
-  s.required_ruby_version = ">= 1.9.3"
+  s.required_ruby_version = '>= 1.8.7'
 
-  s.add_dependency "eventmachine", "1.0.9.1"
+  s.add_dependency "activesupport", "~> 3.0"
+  s.add_dependency "eventmachine", "~> 1.0.0", "<= 1.0.3"
+  s.add_dependency "haml", ">= 3.1", "< 5"
   s.add_dependency "mail", "~> 2.3"
-  s.add_dependency "rack", "~> 1.5"
   s.add_dependency "sinatra", "~> 1.2"
   s.add_dependency "sqlite3", "~> 1.3"
   s.add_dependency "thin", "~> 1.5.0"
   s.add_dependency "skinny", "~> 0.2.3"
+  s.add_dependency "i18n", "<= 0.6.11"
+  s.add_dependency "tilt", "<= 1.4.1"
+  s.add_dependency "mime-types", "< 2"
 
   s.add_development_dependency "coffee-script"
   s.add_development_dependency "compass"
-  s.add_development_dependency "minitest", "~> 5.0"
   s.add_development_dependency "rake"
   s.add_development_dependency "rdoc"
   s.add_development_dependency "sass"
-  s.add_development_dependency "selenium-webdriver"
-  s.add_development_dependency "sprockets"
-  s.add_development_dependency "sprockets-sass"
-  s.add_development_dependency "sprockets-helpers"
-  s.add_development_dependency "uglifier"
 end

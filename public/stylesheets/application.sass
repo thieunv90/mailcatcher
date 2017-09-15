@@ -1,5 +1,5 @@
-@import "compass"
-@import "compass/reset"
+@import compass
+@import compass/reset
 
 html, body
   width: 100%
@@ -7,12 +7,8 @@ html, body
 
 body
   +establish-baseline(12px)
-  display: -moz-box
-  display: -webkit-box
-  display: box
-  -moz-box-orient: vertical
-  -webkit-box-orient: vertical
-  box-orient: vertical
+  +display-box
+  +box-orient(vertical)
   background: #eee
   color: #000
   font-size: 12px
@@ -61,7 +57,7 @@ body > header
     margin-left: 6px
     padding: 6px
     padding-left: 30px
-    background: url(logo.png) left no-repeat
+    background: url(/images/logo.png) left no-repeat
     font-size: 18px
     font-weight: bold
     a
@@ -146,15 +142,9 @@ body > header
     border-bottom: 1px solid #fff
 
 #message
-  display: -moz-box
-  display: -webkit-box
-  display: box
-  -moz-box-orient: vertical
-  -webkit-box-orient: vertical
-  box-orient: vertical
-  -moz-box-flex: 1
-  -webkit-box-flex: 1
-  box-flex: 1
+  +display-box
+  +box-orient(vertical)
+  +box-flex(1)
   > header
     +clearfix
     .metadata
@@ -248,10 +238,6 @@ body > header
           display: list-item
 
 iframe
-  display: -moz-box
-  display: -webkit-box
-  display: box
-  -moz-box-flex: 1
-  -webkit-box-flex: 1
-  box-flex: 1
+  +display-box
+  +box-flex(1)
   background: #fff

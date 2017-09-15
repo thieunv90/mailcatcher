@@ -4,17 +4,19 @@ Catches mail and serves it through a dream.
 
 MailCatcher runs a super simple SMTP server which catches any message sent to it to display in a web interface. Run mailcatcher, set your favourite app to deliver to smtp://127.0.0.1:1025 instead of your default SMTP server, then check out http://127.0.0.1:1080 to see the mail that's arrived so far.
 
-![MailCatcher screenshot](https://cloud.githubusercontent.com/assets/14028/14093249/4100f904-f598-11e5-936b-e6a396f18e39.png)
+![MailCatcher screenshot](http://f.cl.ly/items/3w2T1p0F3g003b2i1F2z/Screen%20shot%202011-06-23%20at%2011.39.03%20PM.png)
 
 ## Features
 
 * Catches all mail and stores it for display.
 * Shows HTML, Plain Text and Source version of messages, as applicable.
-* Rewrites HTML enabling display of embedded, inline images/etc and open links in a new window.
+* Rewrites HTML enabling display of embedded, inline images/etc and open links in a new window. (currently very basic)
+* Can send HTML for analysis by [Fractal][fractal].
 * Lists attachments and allows separate downloading of parts.
 * Download original email to view in your native mail client(s).
 * Command line options to override the default SMTP/HTTP IP and port settings.
 * Mail appears instantly if your browser supports [WebSockets][websockets], otherwise updates every thirty seconds.
+* Growl notifications when you receive a new message.
 * Runs as a daemon run in the background.
 * Sendmail-analogue command, `catchmail`, makes [using mailcatcher from PHP][withphp] a lot easier.
 * Written super-simply in EventMachine, easy to dig in and change.
@@ -24,10 +26,10 @@ MailCatcher runs a super simple SMTP server which catches any message sent to it
 
 1. `gem install mailcatcher`
 2. `mailcatcher`
-3. Go to http://127.0.0.1:1080/
-4. Send mail through smtp://127.0.0.1:1025
+3. Go to http://localhost:1080/
+4. Send mail through smtp://localhost:1025
 
-Use `mailcatcher --help` to see the command line options. The brave can get the source from [the GitHub repository][mailcatcher-github].
+The brave can get the source from [the GitHub repository][mailcatcher-github].
 
 ### Bundler
 
@@ -44,40 +46,22 @@ Under RVM your mailcatcher command may only be available under the ruby you inst
 
 ### Rails
 
-To set up your rails app, I recommend adding this to your `environments/development.rb`:
+To set up your rails app, I recommend adding this to your `environment/development.rb`:
 
     config.action_mailer.delivery_method = :smtp
-    config.action_mailer.smtp_settings = { :address => '127.0.0.1', :port => 1025 }
-    config.action_mailer.raise_delivery_errors = false
+    config.action_mailer.smtp_settings = { :address => "localhost", :port => 1025 }
 
 ### PHP
 
 For projects using PHP, or PHP frameworks and application platforms like Drupal, you can set [PHP's mail configuration](http://www.php.net/manual/en/mail.configuration.php) in your [php.ini](http://www.php.net/manual/en/configuration.file.php) to send via MailCatcher with:
 
-    sendmail_path = /usr/bin/env catchmail -f some@from.address
+    sendmail_path = /usr/bin/env catchmail
 
-You can do this in your [Apache configuration](http://php.net/manual/en/configuration.changes.php) like so:
+You can do this in an [Apache htaccess file](http://php.net/manual/en/configuration.changes.php) or general configuration like so:
 
-    php_admin_value sendmail_path "/usr/bin/env catchmail -f some@from.address"
+    php_value sendmail_path "/usr/bin/env catchmail"
 
 If you've installed via RVM this probably won't work unless you've manually added your RVM bin paths to your system environment's PATH. In that case, run `which catchmail` and put that path into the `sendmail_path` directive above instead of `/usr/bin/env catchmail`.
-
-If starting `mailcatcher` on alternative SMTP IP and/or port with parameters like `--smtp-ip 192.168.0.1 --smtp-port 10025`, add the same parameters to your `catchmail` command:
-
-    sendmail_path = /usr/bin/env catchmail --smtp-ip 192.160.0.1 --smtp-port 10025 -f some@from.address
-
-### Django
-
-For use in Django, simply add the following configuration to your projects' settings.py
-
-```python
-if DEBUG:
-    EMAIL_HOST = '127.0.0.1'
-    EMAIL_HOST_USER = ''
-    EMAIL_HOST_PASSWORD = ''
-    EMAIL_PORT = 1025
-    EMAIL_USE_TLS = False
-```
 
 ### API
 
@@ -91,8 +75,12 @@ A fairly RESTful URL schema means you can download a list of messages in JSON fr
 ## TODO
 
 * Add mail delivery on request, optionally multiple times.
-* Compatibility testing against CampaignMonitor's [design guidelines](http://www.campaignmonitor.com/design-guidelines/) and [CSS support matrix](http://www.campaignmonitor.com/css/).
+* Better Growl support in MacRuby and RubyCocoa with click notifications which takes you to the received message.
+* An API-compatible nodejs version, for fun and profit (and non-ruby npm users).
+* Test suite.
+* Compatibility testing against CampaignMonitor's [design guidelines](http://www.campaignmonitor.com/design-guidelines/) and [CSS support matrix](http://www.campaignmonitor.com/design-guidelines/).
 * Forward mail to rendering service, maybe CampaignMonitor?
+* Package as an app? Native interfaces? HotCocoa?
 
 ## Thanks
 
@@ -113,6 +101,7 @@ Copyright © 2010-2011 Samuel Cochran (sj26@sj26.com). Released under the MIT Li
 For dream catching, try [this](http://goo.gl/kgbh). OR [THIS](http://www.nyanicorn.com), OMG.
 
   [donate]: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=522WUPLRWUSKE
+  [fractal]: http://getfractal.com
   [license]: https://github.com/sj26/mailcatcher/blob/master/LICENSE
   [mailcatcher-github]: https://github.com/sj26/mailcatcher
   [mailcatcher-issues]: https://github.com/sj26/mailcatcher/issues
